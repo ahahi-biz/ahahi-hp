@@ -1,0 +1,4 @@
+Contact: mailto:ryugo.hatanaka@ahahi.biz
+Expires: 2027-12-31T00:00:00.000Z
+Preferred-Languages: ja, en
+Canonical: https://ahahi.biz/.well-known/security.txt

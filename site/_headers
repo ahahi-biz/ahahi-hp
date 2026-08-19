@@ -1,0 +1,40 @@
+# Cloudflare Pages headers（会社HP標準キット）
+# - JS は /js/ の外部ファイルのみ（インライン禁止）。CSS も /css/ のみ
+# - GTM/GA4 を使う場合のために googletagmanager / google-analytics を許可（analytics.js が本番ホストでだけ読み込む）
+# - フォントは自己ホストかシステムフォント（Google Fonts を使うなら style-src/font-src に追加）
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-Permitted-Cross-Domain-Policies: none
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), midi=(), serial=(), bluetooth=(), hid=(), browsing-topics=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+
+# HTML: 5 分キャッシュ
+/
+  Cache-Control: public, max-age=300, must-revalidate
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate
+/company/
+  Cache-Control: public, max-age=300, must-revalidate
+/services/
+  Cache-Control: public, max-age=300, must-revalidate
+/contact/
+  Cache-Control: public, max-age=300, must-revalidate
+/privacy/
+  Cache-Control: public, max-age=300, must-revalidate
+
+# 資産: 7 日キャッシュ（更新時は参照側の ?v= を上げる）
+/css/*
+  Cache-Control: public, max-age=604800
+/js/*
+  Cache-Control: public, max-age=604800
+/img/*
+  Cache-Control: public, max-age=604800
+/og.png
+  Cache-Control: public, max-age=604800
+/favicon.svg
+  Cache-Control: public, max-age=604800

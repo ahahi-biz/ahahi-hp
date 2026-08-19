@@ -1,0 +1,25 @@
+# 品質ゲート（デプロイはしない。配信は Cloudflare Pages の Git 連携が担う）
+# main のブランチ保護で「必須ステータスチェック」に指定する。
+# ⚠️ paths フィルタを付けない（付けると該当パスに触れない PR がマージ不能になる）
+name: Quality gate
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [main]
+concurrency:
+  group: quality-gate-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # チェッカー自身が壊れて「黙って素通し」になっていないかを先に確かめる
+      - name: Selftest check_content.py
+        run: python3 scripts/check_content.py --selftest site
+      # build.sh は本文チェック → middleware 検査 → allowlist コピー → dist 走査（Cloudflare 側と同じ入口）
+      - name: Build (same entry as Cloudflare Pages)
+        run: bash build.sh

@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+# ===== AI クローラー（生成AI の学習・引用）を明示的に許可。サイト概要は /llms.txt =====
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: Claude-Web
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: Bytespider
+Allow: /
+User-agent: MistralAI-User
+Allow: /
+
+Sitemap: https://ahahi.biz/sitemap.xml
