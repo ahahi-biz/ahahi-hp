@@ -13,7 +13,7 @@
 //
 // ▼ ここだけ自分のサイトに合わせて書き換える ▼
 const PROD_HOSTS = ['ahahi.biz', 'www.ahahi.biz'];        // 本番のホスト名（独自ドメインを付けたら追記）
-const STG_HOSTS  = ['ahahi-biz-stg.pages.dev', 'ahahi-biz.pages.dev'];    // 検証(STG)のホスト名
+const STG_HOSTS  = ['ahahi-hp.pages.dev', 'develop.ahahi-hp.pages.dev'];    // 検証(STG)のホスト名
 // ▲ ここまで ▲
 
 const sha256 = async (s) =>
