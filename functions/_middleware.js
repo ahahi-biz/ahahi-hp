@@ -12,7 +12,7 @@
 //   4. 非本番: robots.txt は全 Disallow、sitemap*.xml は 404、X-Robots-Tag: noindex 付与
 //
 // ▼ ここだけ自分のサイトに合わせて書き換える ▼
-const PROD_HOSTS = ['ahahi-hp.pages.dev'];        // 本番のホスト名（独自ドメインを付けたら追記）
+const PROD_HOSTS = ['ahahi-hp.pages.dev', 'ahahi.biz', 'www.ahahi.biz'];        // 本番のホスト名（独自ドメインを付けたら追記）
 const STG_HOSTS  = ['develop.ahahi-hp.pages.dev'];    // 検証(STG)のホスト名
 // ▲ ここまで ▲
 
