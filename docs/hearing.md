@@ -41,8 +41,11 @@
 ### Q3. サイトの公開先（アドレス）
 
 - 質問: サイトの住所（URL）をどうしますか。
-- 回答: **独自ドメイン `ahahi.biz` を使う**（サイトの URL は `https://ahahi.biz/`）
+- 回答: **独自ドメイン `ahahi.biz` を使う**（当初の希望）
 - 確認日: 2026-08-19
+- 変更（2026-08-19）: ahahi.biz は既に Squarespace の準備中ページと Google Workspace のメールで稼働中のため、
+  引っ越し作業が必要と判明。「ドメインにはこだわらない。まず公開したい」との判断により、
+  当面の公開先を **https://ahahi-hp.pages.dev/** とする。ドメイン接続は後日（[dns-before-migration.md](dns-before-migration.md) に現状を控え済み）。
 
 ### Q4. お問い合わせの返信目安
 
@@ -172,8 +175,8 @@
 
 | 用途 | 値 | 確認日 |
 |---|---|---|
-| サイトの URL（canonical / OGP の基準） | https://ahahi.biz/ | 2026-08-19 |
-| 本番ホスト名 | ahahi.biz | 2026-08-19 |
+| サイトの URL（canonical / OGP の基準） | https://ahahi-hp.pages.dev/ ※ドメインは後日 | 2026-08-19 |
+| 本番ホスト名 | ahahi-hp.pages.dev（確認用: develop.ahahi-hp.pages.dev） | 2026-08-19 |
 | 公開メールアドレス（mailto / security.txt） | ryugo.hatanaka@ahahi.biz | 2026-08-19 |
 | 返信の目安（お問い合わせページ） | 24時間以内 | 2026-08-19 |
 | 受付時間（お問い合わせページ） | 24時間受付・土日も返信 | 2026-08-19 |
