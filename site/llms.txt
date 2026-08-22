@@ -4,11 +4,11 @@
 
 ## 主なページ
 
-- トップ: https://ahahi.biz/
-- 会社概要: https://ahahi.biz/company/
-- 事業内容: https://ahahi.biz/services/
-- お問い合わせ: https://ahahi.biz/contact/
-- プライバシーポリシー: https://ahahi.biz/privacy/
+- トップ: https://ahahi-hp.pages.dev/
+- 会社概要: https://ahahi-hp.pages.dev/company/
+- 事業内容: https://ahahi-hp.pages.dev/services/
+- お問い合わせ: https://ahahi-hp.pages.dev/contact/
+- プライバシーポリシー: https://ahahi-hp.pages.dev/privacy/
 
 ## 会社の基本情報
 

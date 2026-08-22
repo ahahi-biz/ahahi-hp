@@ -5,7 +5,7 @@
    - 有効化: GTM_ID を入れる → 参照側の ?v= を上げる → STG で確認 → 本番 */
 (function () {
   var GTM_ID = '';                         // 例: 'GTM-XXXXXXX'（未設定なら計測しない）
-  var PROD_HOST = 'ahahi.biz';             // 本番ホスト名（middleware の PROD_HOSTS と揃える）
+  var PROD_HOST = 'ahahi-hp.pages.dev';    // 本番ホスト名（middleware の PROD_HOSTS と揃える）
   if (!GTM_ID || location.hostname !== PROD_HOST) return;
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
