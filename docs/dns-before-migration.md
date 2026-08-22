@@ -31,7 +31,16 @@ ns-cloud-a4.googledomains.com
 |---|---|---|
 | MX | ahahi.biz | 優先度 1 / smtp.google.com |
 | TXT (SPF) | ahahi.biz | `v=spf1 include:_spf.google.com ~all` |
-| TXT (DKIM) | google._domainkey.ahahi.biz | 設定あり（値は Google 管理画面で確認） |
+| TXT (DKIM) | google._domainkey.ahahi.biz | 下記のとおり |
+
+### DKIM の値（google._domainkey.ahahi.biz の TXT）
+
+```
+v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuGe2oMjnssoE6ACV1Y+zlpJD8rqVNE13zlrwpBIe8UOtbYKDRw3nD9sbW/WYuCQyAs6gamug3pqevbf6GT+6U4uYxsXrm/7I8L+tSVxslm+NDFNSbxu6axb3zVWJa75Nab+ylFhmo6Ls76Bf53R0W+lsAWlsydzvoNl0CyfssQ1RKfaoJoLMrA2CyXuuYjKBDrpNgBU2i1rJ0ggRffPx3NyDJGYoDZym62JTj8kn0ZL8zLSYS+aJWwwXWoL5+4ZML0jDE0U4WK2t5Ci4xp/9t8N03xylA6BfAY7WBjZVTYbKV7hhtNHfxKhrPlCR6b751Ppltk5gjPkxWM1XbJPubwIDAQAB
+```
+
+※ `_domainconnect.ahahi.biz` にもレコードがあるが、これは設定を自動化するための補助的なもので、
+   移行時に無くてもメールとサイトには影響しない。
 | TXT (DMARC) | _dmarc.ahahi.biz | 未設定 |
 
 ## 切り替え時の注意
