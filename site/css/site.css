@@ -583,3 +583,203 @@ p:last-child {
   color: var(--accent);
   font-size: 0.8125rem;
 }
+
+/* 店内写真 */
+.photo {
+  margin: 2rem 0 0;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+}
+
+.photo figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+}
+
+.photo-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.photo-pair .photo {
+  margin: 0;
+}
+
+/* ヒーローの写真は少し明るめに見せる */
+.hero-visual .hero-img {
+  opacity: 0.62;
+}
+
+/* あはひから始まったこと（数字） */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.25rem;
+  margin: 2rem 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.stats li {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1.75rem 1.5rem;
+}
+
+.stats .num {
+  font-family: var(--serif);
+  display: block;
+  color: var(--accent);
+  font-size: 3rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.stats .num .unit {
+  font-size: 1.25rem;
+  margin-left: 0.25rem;
+}
+
+.stats p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+
+/* 数字で見るあはひ（得点板） */
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board li {
+  position: relative;
+  background: linear-gradient(180deg, #17281f 0%, #0d1815 100%);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1.5rem 1.25rem 1.25rem;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* 得点板らしい横の分割線 */
+.board li::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.board-num {
+  font-family: var(--serif);
+  display: inline-block;
+  color: var(--accent);
+  font-size: clamp(2.75rem, 9vw, 3.75rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(201, 169, 97, 0.25);
+}
+
+.board-unit {
+  color: var(--accent);
+  font-size: 1.125rem;
+  margin-left: 0.25rem;
+}
+
+.board-label {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.board-single {
+  grid-template-columns: 1fr;
+}
+
+.board-single .board-num {
+  font-size: clamp(3.5rem, 15vw, 5.25rem);
+}
+
+.board-single li {
+  padding-block: 2rem 1.75rem;
+}
+
+.board-accent li {
+  border-color: var(--accent-soft);
+}
+
+#numbers h3 {
+  margin-top: 2.75rem;
+  font-size: 1.0625rem;
+  color: var(--text);
+}
+
+/* 代表あいさつの署名 */
+.signature {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  letter-spacing: 0.08em;
+}
+
+/* あいさつ文のリズムを出す行 */
+.verse {
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent-soft);
+  color: var(--text);
+}
+
+/* 代表プロフィール */
+.profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.profile-photo {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.profile-body .signature {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.profile-body .small {
+  margin: 0.375rem 0 0;
+}

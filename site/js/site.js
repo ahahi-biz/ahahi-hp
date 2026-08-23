@@ -59,3 +59,45 @@
     box.appendChild(status);
   });
 })();
+
+/* 数字のカウントアップ（得点板）
+   - 画面に入ったら 0 から実際の数字まで数え上げる
+   - JavaScript が動かない環境では、最初から実際の数字が表示される
+   - 「動きを減らす」設定の端末では、animation せずそのまま表示する */
+(function () {
+  'use strict';
+
+  var nums = document.querySelectorAll('.board-num[data-count]');
+  if (!nums.length) return;
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame) return;
+
+  function run(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    if (isNaN(target)) return;
+    var dur = 1100;
+    var start = null;
+    el.textContent = '0';
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (p < 1) window.requestAnimationFrame(step);
+      else el.textContent = String(target);
+    }
+    window.requestAnimationFrame(step);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        run(e.target);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  Array.prototype.forEach.call(nums, function (el) { io.observe(el); });
+})();
