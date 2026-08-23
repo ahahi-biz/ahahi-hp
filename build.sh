@@ -64,6 +64,8 @@ INCLUDE_DIRS=(
   "contact"
   "privacy"
   "media"
+  "workspace"
+  "subsidy"
   ".well-known"
 )
 # あれば公開するディレクトリ（無くても失敗しない。git は空フォルダを保存しないので、
