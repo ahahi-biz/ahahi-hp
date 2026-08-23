@@ -735,3 +735,14 @@ p:last-child {
   font-size: 1.0625rem;
   color: var(--text);
 }
+
+/* 代表あいさつの署名 */
+.signature {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  letter-spacing: 0.08em;
+}
