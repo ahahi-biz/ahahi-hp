@@ -7,7 +7,7 @@
 - トップ: https://www.ahahi.biz/
 - 会社概要: https://www.ahahi.biz/company/
 - 事業内容: https://www.ahahi.biz/services/
-- 発信（note・出演動画）: https://www.ahahi.biz/media/
+- あはひからの情報発信（note・出演動画）: https://www.ahahi.biz/media/
 - お問い合わせ: https://www.ahahi.biz/contact/
 - プライバシーポリシー: https://www.ahahi.biz/privacy/
 
@@ -21,7 +21,7 @@
 - 連絡先: ryugo.hatanaka@ahahi.biz
 - X（旧Twitter）: https://x.com/shindanshi_rh
 
-## 事業内容
+## 事業内容（7事業）
 
 1. カフェ・BARの運営（完全招待制・完全予約制）
 2. イベント・交流会の開催
@@ -30,7 +30,6 @@
 5. 食品・商品の販売、紹介
 6. 中小企業診断士の実務従事・会議室利用
 7. 協業・あはひPRパートナー
-8. 中小企業診断士に向けた情報発信
 
 ## 補足
 
