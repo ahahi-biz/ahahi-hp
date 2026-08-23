@@ -175,8 +175,8 @@
 
 | 用途 | 値 | 確認日 |
 |---|---|---|
-| サイトの URL（canonical / OGP の基準） | https://ahahi-hp.pages.dev/ ※ドメインは後日 | 2026-08-19 |
-| 本番ホスト名 | ahahi-hp.pages.dev（確認用: develop.ahahi-hp.pages.dev） | 2026-08-19 |
+| サイトの URL（canonical / OGP の基準） | https://www.ahahi.biz/ | 2026-08-23 |
+| 本番ホスト名 | www.ahahi.biz（ahahi-hp.pages.dev も本番として受付／確認用: ahahi-hp-stg.pages.dev） | 2026-08-23 |
 | 公開メールアドレス（mailto / security.txt） | ryugo.hatanaka@ahahi.biz | 2026-08-19 |
 | 返信の目安（お問い合わせページ） | 24時間以内 | 2026-08-19 |
 | 受付時間（お問い合わせページ） | 24時間受付・土日も返信 | 2026-08-19 |
