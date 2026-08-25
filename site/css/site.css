@@ -783,3 +783,83 @@ p:last-child {
 .profile-body .small {
   margin: 0.375rem 0 0;
 }
+
+/* よくあるご質問 */
+details {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  max-width: 46rem;
+}
+
+details summary {
+  cursor: pointer;
+  padding: 1.125rem 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  list-style: none;
+  position: relative;
+  padding-right: 3rem;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::after {
+  content: "＋";
+  position: absolute;
+  right: 1.25rem;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+details[open] summary::after {
+  content: "－";
+}
+
+details summary:hover {
+  color: var(--accent);
+}
+
+details > p {
+  margin: 0;
+  padding: 0 1.25rem 1.25rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+/* ご利用までの流れ */
+.steps {
+  max-width: 46rem;
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+  color: var(--muted);
+}
+
+.steps li {
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.steps strong {
+  color: var(--text);
+}
+
+.steps::marker,
+.steps li::marker {
+  color: var(--accent);
+}
+
+/* カード見出しのリンク */
+.card h3 a {
+  text-decoration: none;
+  color: var(--text);
+  border-bottom: 1px solid var(--accent-soft);
+}
+
+.card h3 a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
