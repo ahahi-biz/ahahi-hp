@@ -10,10 +10,57 @@ const SOFT = "F2F5FB";
 
 const F = "Meiryo";
 
+// 配布用（イニシャル版）は第2引数に anon を渡す
+const ANON = process.argv[3] === "anon";
+
+// 実名 → イニシャルの対応（長い表記から先に置換する）
+const ANON_MAP = [
+  ["梁川先生", "B先生"], ["梁川さん", "B先生"],
+  ["塚越さん", "A先生"],
+  ["鵜頭さん", "C先生"],
+  ["石川先生", "D先生"], ["石川さん", "D先生"],
+  ["黒田さん", "E先生"],
+  ["原田さん", "ご担当者の方"],
+  ["外山さん", "Fさん"],
+  ["塩島さん", "Gさん"],
+  ["ビューティーガレージグループ", "L社"],
+  ["三菱フードサービス", "M社"],
+  ["OTCコーヒー", "C社"],
+  ["ppコネクト", "I社"],
+  ["四葉不動産", "J社"],
+  ["アンドドット", "K社"],
+  ["池田紙工", "B社"],
+  ["ミセツク", "E社"],
+  ["Protribe", "H社"],
+  ["scalar", "A社"],
+  ["Caneat", "G社"],
+  ["紹継", "N社"],
+  ["春蔵", "D社"],
+  ["SoVa", "F社"],
+];
+
+function A(t) {
+  if (!ANON || typeof t !== "string") return t;
+  let out = t;
+  for (const [from, to] of ANON_MAP) out = out.split(from).join(to);
+  return out;
+}
+
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.333 x 7.5
 pres.author = "畠中竜吾";
 pres.title = "新人プロコン顧客開拓へのアドバイス";
+
+// すべてのテキストを A() 経由にする（配布用のときだけ置換が効く）
+const _addSlide = pres.addSlide.bind(pres);
+pres.addSlide = function (...args) {
+  const s = _addSlide(...args);
+  const _text = s.addText.bind(s);
+  s.addText = (txt, opts) => _text(A(txt), opts);
+  const _notes = s.addNotes.bind(s);
+  s.addNotes = (txt) => _notes(A(txt));
+  return s;
+};
 
 const W = 13.333;
 const M = 0.7;
@@ -35,11 +82,14 @@ function titleSlide() {
   return s;
 }
 
-function sectionSlide(num, title, sub) {
+function sectionSlide(num, title, sub, lead) {
   const s = pres.addSlide();
   dark(s);
   s.addShape(pres.ShapeType.ellipse, { x: M, y: 2.5, w: 1.1, h: 1.1, fill: { color: GOLD }, line: { color: GOLD } });
   s.addText(String(num), { x: M, y: 2.5, w: 1.1, h: 1.1, fontFace: F, fontSize: 34, bold: true, color: WHITE, align: "center", valign: "middle", isTextBox: true, margin: 0 });
+  if (lead) {
+    s.addText(lead, { x: M + 1.5, y: 1.95, w: CW - 1.5, h: 0.4, fontFace: F, fontSize: 17, bold: true, color: GOLD, isTextBox: true, margin: 0, charSpacing: 1, fit: "shrink" });
+  }
   s.addText(title, { x: M + 1.5, y: 2.45, w: CW - 1.5, h: 1.0, fontFace: F, fontSize: 34, bold: true, color: WHITE, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
   if (sub) {
     s.addText(sub, { x: M + 1.5, y: 3.55, w: CW - 1.5, h: 0.8, fontFace: F, fontSize: 16, color: ICE, isTextBox: true, margin: 0, fit: "shrink" });
@@ -127,17 +177,44 @@ statement("3年前、私は\n皆さんと同じ席に座っていました", "�
     { h: "1976年生まれ・50歳", d: "リコージャパンにほぼ25年。48歳で独立" },
     { h: "中小企業診断士は2009年2月取得", d: "その後ずっと資格を寝かせてきた" },
     { h: "プロコン塾11期生 → 2024年9月1日に独立", d: "卒塾後に独立。この講義を聞いて感化された側" },
-    { h: "株式会社あはひ 代表取締役", d: "神田淡路町でカフェBARを運営。会員126名・うち診断士85名（2026年7月末）" },
+    { h: "株式会社あはひ 代表取締役", d: "神田淡路町でカフェBARを運営。" },
   ], { y: 1.9, gap: 1.05 });
   s.addNotes("YouTube視聴済み前提なので2分程度で。");
 }
 
-// 3.5 期待を裏切る
+// 顧客開拓の方法（お題への直球回答）
+{
+  const s = content("顧客開拓の方法は、これだけです", "結論から");
+  rows(s, [
+    { h: "決裁権がある、課題を抱えている人に会う", d: "" },
+    { h: "その人の現状と、あるべき姿を聞く", d: "" },
+    { h: "そのギャップを、相手と共有する", d: "" },
+    { h: "その解決策を提示する", d: "" },
+  ], { y: 2.1, gap: 1.05, hs: 22 });
+  note(s, "それだけです。特別な技術も、話術も要りません。");
+  s.addNotes("お題そのものへの答えを、最初に出し切る。");
+}
+
+{
+  const s = content("でも、それだけでは成功しません", "結論から");
+  s.addShape(pres.ShapeType.roundRect, { x: M, y: 1.8, w: CW, h: 1.15, rectRadius: 0.08, fill: { color: NAVY }, line: { color: NAVY } });
+  s.addText("無理やり時間をとってもらってヒアリングしても、うまくいきません。\nなぜなら、信用残高が貯まっていないから。信頼された関係ではないからです。", { x: M + 0.4, y: 1.8, w: CW - 0.8, h: 1.15, fontFace: F, fontSize: 18, bold: true, color: WHITE, valign: "middle", isTextBox: true, margin: 0, lineSpacing: 28, fit: "shrink" });
+  rows(s, [
+    { h: "信頼されている相手・信用残高がある相手を、棚卸しする", d: "今日の最後のワークが、まさにこの棚卸しです" },
+    { h: "その相手に、ヒアリングを実施する", d: "時間を無理にとってもらう必要がありません" },
+    { h: "提案が間違っていなければ、芯を食う提案であれば", d: "" },
+    { h: "ある程度の割合で、案件化・受注へ進みます", d: "" },
+  ], { y: 3.25, gap: 0.83, hs: 18 });
+  note(s, "だから今日は、「信用残高」と「仕組み」の話をします。");
+  s.addNotes("顧客開拓の方法そのものではなく、その前提条件が今日のテーマだと橋渡しする。");
+}
+
+// 期待を裏切る
 {
   const s = content("今日、皆さんの期待を1つだけ裏切ります", "はじめに");
   cards(s, [
     { t: "期待していること", b: "「顧客開拓のやり方を聞きに来た」\n\n新規のお客さまをどうやって見つけて、どう営業して、どう契約に持っていくのか。" },
-    { t: "私がお話しすること", b: "私は、開拓していません。\n\nこの2年で受けた仕事26件のうち、こちらから売り込んで取ったものはゼロです。" },
+    { t: "私がお話しすること", b: "やり方は、いまお見せした4つだけです。\n\n問題は「誰に」やるか。私は売り込みをしていません。この2年の26件のうち、売り込んで取ったものはゼロです。" },
   ], { y: 2.1, h: 2.9 });
   s.addText("では、どうやって26件が来たのか。それが今日の3時間です。", { x: M, y: 5.3, w: CW, h: 0.7, fontFace: F, fontSize: 22, bold: true, color: NAVY, isTextBox: true, margin: 0, fit: "shrink" });
   s.addNotes("ズレを先に自分から言う。ズレがつかみに変わる。");
@@ -154,10 +231,31 @@ statement("3年前、私は\n皆さんと同じ席に座っていました", "�
   s.addNotes("持ち帰るものを先に宣言する。");
 }
 
+// 本日の進め方
+{
+  const s = content("本日の進め方", "この3時間で");
+  const plan = [
+    { t: "13:00-14:00", n: "講義", d: "資料を使って、私の2年間を一気にお話しします" },
+    { t: "14:00-14:05", n: "ワークの共有", d: "このあとやっていただくワークの内容を、先にお伝えします" },
+    { t: "14:05-15:05", n: "質疑応答", d: "1時間とります。何でも聞いてください" },
+    { t: "15:05-15:20", n: "個人ワーク", d: "自分のエコシステムを設計する" },
+    { t: "15:20-15:50", n: "発表", d: "書いたものを発表していただきます" },
+    { t: "15:50-16:00", n: "まとめ", d: "資料に戻って、今日のまとめ" },
+  ];
+  plan.forEach((r, i) => {
+    const y = 1.8 + i * 0.72;
+    s.addShape(pres.ShapeType.roundRect, { x: M, y: y, w: 2.3, h: 0.62, rectRadius: 0.06, fill: { color: i === 2 ? GOLD : SOFT }, line: { color: i === 2 ? GOLD : SOFT } });
+    s.addText(r.t, { x: M, y: y, w: 2.3, h: 0.62, fontFace: F, fontSize: 14, bold: true, color: i === 2 ? WHITE : NAVY, align: "center", valign: "middle", isTextBox: true, margin: 0 });
+    s.addText(r.n, { x: M + 2.6, y: y, w: 2.6, h: 0.62, fontFace: F, fontSize: 17, bold: true, color: NAVY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+    s.addText(r.d, { x: M + 5.3, y: y, w: CW - 5.3, h: 0.62, fontFace: F, fontSize: 14, color: GRAY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  });
+  note(s, "今日いちばん長いのは、私が話す時間ではなく、皆さんが聞く時間です。");
+}
+
 // =========================================================
 // 第1部
 // =========================================================
-sectionSlide(1, "塾生だったころの私", "13:10-13:26／18分　当時、私がいちばん聞きたかったこと");
+sectionSlide(1, "塾生だったころの私", "講義 8分　当時、私がいちばん聞きたかったこと");
 
 {
   const s = content("なぜプロコン塾に入ったのか", "第1部");
@@ -201,7 +299,12 @@ sectionSlide(1, "塾生だったころの私", "13:10-13:26／18分　当時、�
 // =========================================================
 // 第2部
 // =========================================================
-sectionSlide(2, "まだ何者でもなかった4人が、\nどうやっていまの地位に立ったか", "13:26-13:46／20分　先輩プロコン4人を分解する");
+sectionSlide(
+  2,
+  "まだ何者でもなかった4人が、\nどうやっていまの地位に立ったか",
+  "儲けている＝独立診断士として自己実現できている先輩を分析すること　／　講義 10分",
+  "私がプロコン塾で学んだこと"
+);
 
 function teacherSlide(name, income, origin, howList, nowText) {
   const s = content(name, "第2部");
@@ -217,7 +320,7 @@ function teacherSlide(name, income, origin, howList, nowText) {
 }
 
 teacherSlide(
-  "塚越さん",
+  "〇〇先生",
   "推定 3000万円以上",
   "中小企業向け大手コンサル会社の事業部長",
   [
@@ -229,7 +332,7 @@ teacherSlide(
 );
 
 teacherSlide(
-  "梁川さん",
+  "〇〇先生",
   "推定 2000万円以上",
   "資格取得後すぐ独立。数年はうまくいかず苦労した（独立当初の年収は50万円）",
   [
@@ -241,7 +344,7 @@ teacherSlide(
 );
 
 teacherSlide(
-  "鵜頭さん",
+  "〇〇先生",
   "推定 1500万円以上",
   "自治体に勤務。自治体の作法に詳しい",
   [
@@ -253,8 +356,8 @@ teacherSlide(
 );
 
 teacherSlide(
-  "石川さん",
-  "推定 年収不明",
+  "〇〇先生",
+  "推定 1000万円以上",
   "独立初期に商工会のコーディネーターとなり、10年以上契約を更新",
   [
     { h: "最初は飲食もSNSマーケも、かじる程度だった" },
@@ -279,7 +382,7 @@ statement("ブランディング（＝信用）と、\nエコシステム。", "
 // =========================================================
 // 第3部
 // =========================================================
-sectionSlide(3, "「尖っていないとダメ」を疑う", "13:46-14:02／16分　成功の定義を先に決める");
+sectionSlide(3, "「尖っていないとダメ」を疑う", "講義 8分　成功の定義を先に決める");
 
 {
   const s = content("必ず言われる、この教え", "第3部");
@@ -301,7 +404,7 @@ sectionSlide(3, "「尖っていないとダメ」を疑う", "13:46-14:02／16�
   ], { y: 2.1, gap: 1.25, hs: 19 });
 }
 
-statement("梁川さんは、独立当初の年収は\n50万円だったと言っていました。", "いま推定2000万円。最初から尖っていた人はいません。");
+statement("〇〇先生は、独立当初の年収は\n50万円だったと言っていました。", "いま推定2000万円。最初から尖っていた人はいません。");
 
 {
   const s = content("私が考える「独立診断士としての成功」", "第3部");
@@ -323,10 +426,24 @@ statement("梁川さんは、独立当初の年収は\n50万円だったと言�
   ], { y: 2.2, h: 3.0 });
 }
 
+{
+  const s = content("よく言われます。「窓口相談で経験を積みなさい」", "第3部");
+  rows(s, [
+    { h: "それは、間違いではないと思います", d: "強みも「〇〇なら〇〇先生」も、数年の実績を積み上げた結果＝今の姿ですから" },
+    { h: "でも、窓口相談のまま、掲げた目標を達成していない先輩も見てきました", d: "" },
+    { h: "一方で、独立してキラキラしている先生もいます", d: "" },
+  ], { y: 2.1, gap: 1.25, hs: 19 });
+  note(s, "その違いは、どこにあるのでしょうか。私がいちばん興味を持ったのは、ここでした。");
+  s.addNotes("受講生に問いかけて、少し間を置く。答えは次のスライド。");
+}
+
+statement("その違いは、\n仕組み化ができているかどうかです。", "同じように経験を積んでも、仕組みにした人だけが、次の仕事を連れてこられます")
+  .addNotes("ここが今日の答え。この先の第4部・第5部・第6部は、全部この一言の説明。");
+
 // =========================================================
 // 第4部
 // =========================================================
-sectionSlide(4, "私の売上を、全部お見せします", "14:12-14:30／18分　独立2年間の月次売上");
+sectionSlide(4, "私の売上を、全部お見せします", "講義 9分　独立2年間の月次売上");
 
 {
   const s = content("出発点：会社員時代の年収", "第4部");
@@ -430,7 +547,7 @@ sectionSlide(4, "私の売上を、全部お見せします", "14:12-14:30／18�
 // =========================================================
 // 第5部
 // =========================================================
-sectionSlide(5, "26件、どこから来たのか", "14:30-14:58／28分　公的支援と民間、1件ずつ何をやったか。最後に共通点を探します");
+sectionSlide(5, "26件、どこから来たのか", "講義 15分　公的支援と民間、1件ずつ何をやったか");
 
 {
   const s = content("2年間で受けた仕事26件の入口", "第5部");
@@ -460,8 +577,8 @@ statement("まず、公的支援。\n最初の一歩で何をやったか。");
   const s = content("公的支援の入り方は、2つありました", "第5部｜公的支援");
   cards(s, [
     { t: "① 登録して、応募する", b: "城北支部のキャリアデータベースに登録。\n公募が出たので応募し、補助金の書面審査へ。\n\nこれが、独立後に最初に報酬を得た仕事のひとつです。" },
-    { t: "② 人に、相談する", b: "プロコン塾の懇親会で石川先生に相談。\n面接を受けて、商工会議所BSDの専門家に。\n\n中小機構も、リコージャパン時代の上司がそこで働いていたところから。" },
-  ], { y: 2.1, h: 3.0 });
+    { t: "② 人に、相談する", b: "商工会議所BSD：プロコン塾の懇親会で石川先生に相談し、面接を受けて専門家に。\n\n中小機構：リコージャパン時代の上司が、中小機構で働いていた。\n\n振興公社：原田さんから絶大なサポートをいただいた。どの仕事が自分に合っているかまで相談に乗っていただいた。" },
+  ], { y: 2.1, h: 3.4, bs: 14 });
   note(s, "公的支援も、半分は「人」から入っています。登録だけではありません。");
   s.addNotes("①は誰でも今日できる。②は第1部の「出会いがいちばん大きかった」の回収。");
 }
@@ -494,7 +611,7 @@ statement("まず、公的支援。\n最初の一歩で何をやったか。");
   box(cx(2), 3.5, BW, "専門家派遣の\n依頼をいただいた", NAVY, WHITE, 14);
 
   s.addShape(pres.ShapeType.roundRect, { x: M, y: 4.9, w: CW, h: 0.9, rectRadius: 0.08, fill: { color: SOFT }, line: { color: SOFT } });
-  s.addText("中小機構の専門家も、リコージャパン時代の上司が中小機構で働いていたところから", { x: M + 0.3, y: 4.9, w: CW - 0.6, h: 0.9, fontFace: F, fontSize: 16, bold: true, color: NAVY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("中小機構の専門家も、リコージャパン時代の上司が中小機構で働いていたところから\n振興公社は、原田さんから絶大なサポート。どの仕事が自分に合っているかまで相談に乗っていただいた", { x: M + 0.3, y: 4.9, w: CW - 0.6, h: 0.9, fontFace: F, fontSize: 15, bold: true, color: NAVY, valign: "middle", isTextBox: true, margin: 0, lineSpacing: 22, fit: "shrink" });
 
   note(s, "石川先生は、第2部でお話しした「飲食といえば」のあの先生です。");
   s.addNotes("塾の懇親会が仕事になった、という事実を強調する。受講生は今日その場にいる。");
@@ -502,7 +619,7 @@ statement("まず、公的支援。\n最初の一歩で何をやったか。");
 
 {
   const s = content("そこから、登録先が8つに増えた", "第5部｜公的支援");
-  const items = ["城北支部のキャリアデータベース（公募 → 補助金の書面審査）", "塩島さんの会社のデータベース", "商工会議所BSD の専門家派遣", "中小機構の専門家", "信用保証協会の専門家", "公社の専門家", "公社の先進デジタル（11月から）", "ニューマ（6月から）"];
+  const items = ["城北支部のキャリアデータベース\n（公募 → 補助金の書面審査）", "塩島さんの会社のデータベース", "商工会議所BSD の専門家派遣", "中小機構の専門家", "信用保証協会の専門家", "公社の専門家", "公社の先進デジタル（11月から）", "公社のニューマ事業（6月から）"];
   items.forEach((t, i) => {
     const col = i < 4 ? 0 : 1;
     const idx = i % 4;
@@ -521,8 +638,8 @@ statement("次に、民間の仕事。\n1件ずつ、何をやったか。");
   const s = content("過去の縁が、独立を機に仕事になった（5件）", "第5部｜民間");
   rows(s, [
     { h: "地元のサッカークラブ", d: "コロナ禍から支援していて、会社を辞めることになり顧問に" },
-    { h: "ホームページ作成会社（リコー時代の支援先）", d: "退職が決まり、有給休暇中に奄美大島まで会いに行き、その夜に決まった" },
-    { h: "scalar（理工のときの支援先）", d: "「会社を辞めるなら一緒に」と誘われて" },
+    { h: "ホームページ作成会社（リコージャパン時代の支援先）", d: "退職が決まり、有給休暇中に奄美大島まで会いに行き、その夜に決まった" },
+    { h: "scalar（リコージャパン時代の支援先）", d: "「会社を辞めるなら一緒に」と誘われて" },
     { h: "リコージャパン（古巣）", d: "前職からの依頼" },
     { h: "弟の会社", d: "泣きついた" },
   ], { y: 1.9, gap: 0.95, hs: 17 });
@@ -546,7 +663,7 @@ statement("次に、民間の仕事。\n1件ずつ、何をやったか。");
     { h: "OTCコーヒー", d: "scalar からの紹介・創業支援" },
     { h: "春蔵", d: "顧問先からの紹介" },
     { h: "ミセツク", d: "顧問先からの紹介" },
-    { h: "sova", d: "顧問先からの紹介" },
+    { h: "SoVa", d: "顧問先からの紹介" },
     { h: "Caneat", d: "顧問先からの紹介" },
     { h: "Protribe", d: "顧問先からの紹介" },
   ];
@@ -574,8 +691,8 @@ statement("次に、民間の仕事。\n1件ずつ、何をやったか。");
 {
   const s = content("個人的な縁　／　未来への仕込み", "第5部｜民間");
   cards(s, [
-    { t: "個人的な縁（1件）", b: "継承\n\n息子のチームメイトのご縁から。" },
-    { t: "未来への仕込み（2件）", b: "ラーメンのセントラルキッチンからの展開 → 売却\nカフェBAR事業\n\nいまはお金を生みませんが、バイアウトで1000万といった出口を見ています。" },
+    { t: "個人的な縁", b: "紹継\n\n息子のチームメイトのご縁から。" },
+    { t: "未来への仕込み", b: "・ラーメン屋の多店舗展開 → 売却\n・カフェBAR事業\n\nいまはお金を生みませんが、未来への仕込み" },
   ], { y: 2.1, h: 3.2 });
 }
 
@@ -598,7 +715,7 @@ statement("こちらから売り込んで取った仕事は、\nひとつもあ�
 // =========================================================
 // 第6部
 // =========================================================
-sectionSlide(6, "信用とエコシステム", "15:03-15:23／20分　では、26件は何によって来たのか");
+sectionSlide(6, "信用とエコシステム", "講義 10分　26件は何によって来たのか。営業戦略をファネルで整理します");
 
 {
   const s = content("「営業力」という言葉が、私は大嫌いです", "第6部");
@@ -617,6 +734,37 @@ statement("信用です。");
     { t: "残高が減る行為", b: "・遅れる\n・雑にやる\n・断らずに抱えて落とす\n・顔を出さなくなる" },
   ], { y: 2.35, h: 3.1, bs: 15 });
   note(s, "第2部の4人も、全員が依頼元に対する信用残高が圧倒的に高い状態でした。");
+}
+
+{
+  const s = content("たくさん、Giveをする", "第6部");
+  s.addText("そのGiveは、いつか、提供したGiveより大きくなって返ってきます。", { x: M, y: 1.75, w: CW, h: 0.4, fontFace: F, fontSize: 16, color: GRAY, isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("顧問先のホームページ制作会社が、事業を大きくしたきっかけ", { x: M, y: 2.25, w: CW, h: 0.35, fontFace: F, fontSize: 13, bold: true, color: GOLD, isTextBox: true, margin: 0 });
+  const gbox = (x, y, w, h, t, fill, color, size) => {
+    s.addShape(pres.ShapeType.roundRect, { x, y, w, h, rectRadius: 0.06, fill: { color: fill }, line: { color: fill } });
+    s.addText(t, { x: x + 0.2, y, w: w - 0.4, h, fontFace: F, fontSize: size || 15, bold: true, color, valign: "middle", isTextBox: true, margin: 0, lineSpacing: 22, fit: "shrink" });
+  };
+  gbox(M, 2.65, CW, 0.85, "中学や高校の同級生、10人以上の会社のホームページを、無料で作ってあげた", SOFT, NAVY, 17);
+  s.addShape(pres.ShapeType.downArrow, { x: M + CW / 2 - 0.2, y: 3.57, w: 0.4, h: 0.33, fill: { color: GOLD }, line: { color: GOLD } });
+  gbox(M, 4.0, CW, 0.85, "同級生の周りにいる人が言った。「そのHP、どこで作ったの？ いい感じじゃん。俺にも紹介してよ」", SOFT, NAVY, 17);
+  s.addShape(pres.ShapeType.downArrow, { x: M + CW / 2 - 0.2, y: 4.92, w: 0.4, h: 0.33, fill: { color: GOLD }, line: { color: GOLD } });
+  gbox(M, 5.35, CW, 0.85, "紹介いただいた方々のホームページ制作で、キャッシュを生んだ", NAVY, WHITE, 17);
+  note(s, "無料で作った10人が、そのまま入口になりました。Giveは、ファネルの入口を広げる投資です。");
+  s.addNotes("Give が回収されるまでには時間がかかる。だから早く始めるほどいい、と添える。");
+}
+
+{
+  const s = content("もうひとつの側面。人の信用の嵩を借りる", "第6部");
+  s.addText("これは、無意識にみんながやっていることです。", { x: M, y: 1.75, w: CW, h: 0.4, fontFace: F, fontSize: 16, color: GRAY, isTextBox: true, margin: 0, fit: "shrink" });
+  s.addShape(pres.ShapeType.roundRect, { x: M, y: 2.25, w: CW, h: 1.5, rectRadius: 0.08, fill: { color: NAVY }, line: { color: NAVY } });
+  s.addText("「私の弟はシュラスコレストランを8年前に立ち上げ、いまでは国内外50店舗・55億円の売上を誇る経営者です。\n私も創業から支援しています」", { x: M + 0.4, y: 2.25, w: CW - 0.8, h: 1.5, fontFace: F, fontSize: 18, bold: true, color: WHITE, valign: "middle", isTextBox: true, margin: 0, lineSpacing: 28, fit: "shrink" });
+  s.addText("こう言われると、「この人には実力がある。コンサルを任せるに値する」と感じませんか。", { x: M, y: 3.9, w: CW, h: 0.4, fontFace: F, fontSize: 16, bold: true, color: NAVY, isTextBox: true, margin: 0, fit: "shrink" });
+  rows(s, [
+    { h: "口コミも、誰から聞くかで感じ方がまったく違う", d: "他人の口コミより、自分が信頼している人からの口コミのほうが効きます" },
+    { h: "通販のMGM（Member Get Member）も同じ発想", d: "会員が会員を連れてくる、紹介の導線をつくる施策です" },
+    { h: "自分の信用残高が少ないうちは、信用を借りる", d: "自分に信頼を置いてくれている人の信用を借りる。これも販路開拓の有効な手法です" },
+  ], { y: 4.45, gap: 0.85, hs: 17 });
+  s.addNotes("MGM は通販でよく使われる用語。会員紹介プログラムのこと。");
 }
 
 {
@@ -670,6 +818,44 @@ statement("信用です。");
 }
 
 {
+  const s = content("ドラッカーが言っていることと同じです", "第6部");
+  s.addShape(pres.ShapeType.roundRect, { x: M, y: 2.0, w: CW, h: 1.5, rectRadius: 0.08, fill: { color: NAVY }, line: { color: NAVY } });
+  s.addText("マーケティングの理想は、販売を不要にすることである", { x: M + 0.5, y: 2.0, w: CW - 1.0, h: 1.1, fontFace: F, fontSize: 26, bold: true, color: WHITE, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("P.F.ドラッカー『マネジメント』", { x: M + 0.5, y: 3.0, w: CW - 1.0, h: 0.4, fontFace: F, fontSize: 13, color: ICE, isTextBox: true, margin: 0 });
+  rows(s, [
+    { h: "つまり、販売をせずに売れる仕組みをつくること", d: "営業をしないのではありません。営業をしなくても仕事が来る状態を、先につくるのです" },
+    { h: "私の26件は、まさにこれでした", d: "売り込んだ仕事はゼロ。仕組みが、仕事を連れてきてくれました" },
+  ], { y: 3.9, gap: 1.2, hs: 19 });
+  s.addNotes("引用は『マネジメント』の有名な一節。原文は The aim of marketing is to make selling superfluous.");
+}
+
+// 営業戦略をファネルで整理する
+{
+  const s = content("営業戦略を、ファネルで整理する", "第6部");
+  const stages = [
+    { t: "入口をつくる", d: "接点を増やす。登録する、場に出る、会いに行く", w: 8.2 },
+    { t: "濾す", d: "来た話から、自分に合うものを選ぶ", w: 7.0 },
+    { t: "実践・実施する", d: "引き受けた1件を、期待以上でやり切る", w: 5.8 },
+    { t: "成果を出す", d: "相手の成果になる。ここで信用が貯まる", w: 4.6 },
+  ];
+  stages.forEach((st, i) => {
+    const y = 1.9 + i * 0.95;
+    const x = M + (9.2 - st.w) / 2;
+    s.addShape(pres.ShapeType.roundRect, { x: x, y: y, w: st.w, h: 0.78, rectRadius: 0.06, fill: { color: i === 3 ? NAVY : SOFT }, line: { color: i === 3 ? NAVY : SOFT } });
+    s.addText(st.t, { x: x + 0.2, y: y, w: st.w - 0.4, h: 0.78, fontFace: F, fontSize: 17, bold: true, color: i === 3 ? WHITE : NAVY, align: "center", valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+    s.addText(st.d, { x: M + 9.5, y: y + 0.05, w: CW - 9.5, h: 0.7, fontFace: F, fontSize: 12, color: GRAY, valign: "middle", isTextBox: true, margin: 0, lineSpacing: 16, fit: "shrink" });
+  });
+  s.addShape(pres.ShapeType.roundRect, { x: M + 1.2, y: 5.6, w: 6.8, h: 0.8, rectRadius: 0.06, fill: { color: GOLD }, line: { color: GOLD } });
+  s.addText("紹介を受ける", { x: M + 1.2, y: 5.6, w: 6.8, h: 0.8, fontFace: F, fontSize: 17, bold: true, color: WHITE, align: "center", valign: "middle", isTextBox: true, margin: 0 });
+  s.addShape(pres.ShapeType.leftArrow, { x: M + 0.15, y: 5.8, w: 1.0, h: 0.4, fill: { color: GOLD }, line: { color: GOLD } });
+  s.addShape(pres.ShapeType.upArrow, { x: M + 0.35, y: 1.9, w: 0.5, h: 3.9, fill: { color: GOLD }, line: { color: GOLD } });
+  s.addText("入口が\n大きくなる", { x: M - 0.55, y: 3.2, w: 1.0, h: 0.9, fontFace: F, fontSize: 12, bold: true, color: GOLD, align: "center", valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("紹介が、次の入口になる", { x: M + 9.5, y: 5.75, w: CW - 9.5, h: 0.5, fontFace: F, fontSize: 13, color: GRAY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("一般的なファネルは、下まで絞られて終わります。\n私のファネルは、成果が紹介になって、もう一度 入口に戻ります。", { x: M, y: 6.4, w: CW, h: 0.9, fontFace: F, fontSize: 16, bold: true, color: GOLD, isTextBox: true, margin: 0, lineSpacing: 23, fit: "shrink" });
+  s.addNotes("ここが今日の営業戦略の骨格。次のスライドで、実データに当てはめて見せる。");
+}
+
+{
   const s = content("私のエコシステム", "第6部");
   const box = (x, y, w, h, t, fill, color, size) => {
     s.addShape(pres.ShapeType.roundRect, { x, y, w, h, rectRadius: 0.06, fill: { color: fill }, line: { color: fill } });
@@ -708,6 +894,18 @@ statement("信用です。");
 }
 
 {
+  const s = content("私だけではありません。黒田さんの仕組み", "第6部");
+  s.addText("仕組みをつくるという意味で、私がいちばん近くで見てきた成功事例です。", { x: M, y: 1.75, w: CW, h: 0.4, fontFace: F, fontSize: 15, color: GRAY, isTextBox: true, margin: 0 });
+  cards(s, [
+    { t: "① 前職の縁", b: "前職の縁で、仕事をつないでいる。\n\n私の「過去の縁5件」と同じ入口です。" },
+    { t: "② 公的支援", b: "公的支援に申し込み、契約を勝ち取っている。\n\n私の「登録先8つ」と同じ入口です。" },
+    { t: "③ サウナといえば", b: "サウナといえば、で案件の相談が来る。\n\n紹介が流れ込むエコシステムを完成させています。" },
+  ], { y: 2.35, h: 3.0 });
+  note(s, "入口が2つ、そして紹介が回っている。これが仕組みが完成している状態です。");
+  s.addNotes("黒田さんの事例は、受講生と年次が近いぶん、4人の先生より距離が近い。");
+}
+
+{
   const s = content("回すために必要なのは、3つだけ", "第6部");
   rows(s, [
     { h: "入口を複数持つ", d: "登録先、過去の縁、逆営業。ひとつに依存しない" },
@@ -729,51 +927,67 @@ statement("信用です。");
   note(s, "今日できるのは1と2。3で差がつき、4は勝手に回りだします。");
 }
 
-// =========================================================
-// 第7部
-// =========================================================
-sectionSlide(7, "やらない仕事を決める", "15:23-15:31／8分　私の失敗談から");
-
 {
-  const s = content("失敗談：Webの仕事で疲弊しました", "第7部");
-  rows(s, [
-    { h: "1年目、easy で Web 作成をしたことから、Webの仕事を受けた", d: "" },
-    { h: "期待値が高くて、疲弊した", d: "" },
-    { h: "1年後、Webは基本的に受けないと決めた", d: "" },
-  ], { y: 2.3, gap: 1.15, hs: 21 });
-  note(s, "いまは、やらない仕事を決めることがコンサルとして重要だと思っています。");
-}
-
-{
-  const s = content("やる仕事ではなく、やらない仕事を決める", "第7部");
-  const items = ["自分の価値を高める仕事だけをする", "いつでも仕事を切れる状態にする", "一つの顧問先に依存しない", "自分の生き方を決める", "自分にしかできないをつくる", "トップコンサルを目指さない", "自分が幸せになる仕事を選ぶ", "自分が幸せなら、周りも幸せになる"];
-  items.forEach((t, i) => {
-    const col = i < 4 ? 0 : 1;
-    const idx = i % 4;
-    const x = M + col * (CW / 2 + 0.15);
-    const y = 2.0 + idx * 0.95;
-    s.addShape(pres.ShapeType.roundRect, { x: x, y: y, w: CW / 2 - 0.3, h: 0.75, rectRadius: 0.06, fill: { color: i >= 6 ? NAVY : SOFT }, line: { color: i >= 6 ? NAVY : SOFT } });
-    s.addText(t, { x: x + 0.25, y: y, w: CW / 2 - 0.8, h: 0.75, fontFace: F, fontSize: 16, bold: true, color: i >= 6 ? WHITE : INK, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+  const s = content("私たちは、自分をコンサルできているか", "第6部");
+  s.addText("診断士は知識があるのに、その知識を自分に使えません。自分をコンサルできないのです。", { x: M, y: 1.75, w: CW, h: 0.45, fontFace: F, fontSize: 16, color: GRAY, isTextBox: true, margin: 0, fit: "shrink" });
+  const steps = ["現実を棚卸しする", "目標を定める", "ギャップをあらわにする", "埋める方策を検討する", "実行する"];
+  const bw = 2.25, gp = 0.18;
+  steps.forEach((t, i) => {
+    const x = M + (bw + gp) * i;
+    s.addShape(pres.ShapeType.roundRect, { x: x, y: 2.35, w: bw, h: 1.0, rectRadius: 0.06, fill: { color: SOFT }, line: { color: SOFT } });
+    s.addText(t, { x: x + 0.1, y: 2.35, w: bw - 0.2, h: 1.0, fontFace: F, fontSize: 14, bold: true, color: NAVY, align: "center", valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+    if (i < 4) s.addShape(pres.ShapeType.rightArrow, { x: x + bw + 0.01, y: 2.75, w: 0.16, h: 0.2, fill: { color: GOLD }, line: { color: GOLD } });
   });
-  note(s, "成功の定義②「自分の人生を自分でコントロールしている実感」は、ここから来ます。");
+  s.addText("これが、私たちがお客さまにやっている仕事です。", { x: M, y: 3.5, w: CW, h: 0.4, fontFace: F, fontSize: 14, color: GRAY, isTextBox: true, margin: 0 });
+  rows(s, [
+    { h: "であれば、まず自分をコンサルする", d: "自分をコンサルできない人が、他人をコンサルできるでしょうか" },
+    { h: "そこから、にじみ出る自信が生まれる", d: "私が分析した先生は、例外なくオーラがあります。あれは、自分をコンサルできている人の自信です" },
+  ], { y: 4.1, gap: 1.2, hs: 20 });
+  s.addNotes("講義パートの締め。このあとのワークが、まさに自分をコンサルする時間になる。");
 }
 
 // =========================================================
 // ワーク
 // =========================================================
-sectionSlide(8, "個人ワーク：自分のエコシステムを設計する", "15:31-15:55／24分　1本だけ、循環を描いて帰ってください");
+{
+  const s = content("聞いただけでは、成果は出ません", "第6部");
+  s.addText("販路開拓の方法も、知識も、事例も、学んだだけでは成果になりません。", { x: M, y: 1.75, w: CW, h: 0.4, fontFace: F, fontSize: 16, color: GRAY, isTextBox: true, margin: 0, fit: "shrink" });
+  const steps = [
+    { t: "① インプットする", d: "自分に情報として入れる" },
+    { t: "② 使える形に整理する", d: "自分の言葉・自分の型に直す" },
+    { t: "③ 使う環境をつくる", d: "使える場所を、自分で用意する" },
+    { t: "④ 実際に、武器として使う", d: "ここまでやって、使える知識になる" },
+  ];
+  const bw = 2.85, gp = 0.28;
+  steps.forEach((st, i) => {
+    const x = M + (bw + gp) * i;
+    s.addShape(pres.ShapeType.roundRect, { x: x, y: 2.35, w: bw, h: 1.5, rectRadius: 0.06, fill: { color: i === 3 ? NAVY : SOFT }, line: { color: i === 3 ? NAVY : SOFT } });
+    s.addText(st.t, { x: x + 0.15, y: 2.55, w: bw - 0.3, h: 0.5, fontFace: F, fontSize: 15, bold: true, color: i === 3 ? WHITE : NAVY, align: "center", isTextBox: true, margin: 0, fit: "shrink" });
+    s.addText(st.d, { x: x + 0.15, y: 3.05, w: bw - 0.3, h: 0.6, fontFace: F, fontSize: 12, color: i === 3 ? ICE : GRAY, align: "center", isTextBox: true, margin: 0, lineSpacing: 16, fit: "shrink" });
+    if (i < 3) s.addShape(pres.ShapeType.rightArrow, { x: x + bw + 0.02, y: 2.98, w: 0.24, h: 0.24, fill: { color: GOLD }, line: { color: GOLD } });
+  });
+  rows(s, [
+    { h: "知識を得るだけでは、ダメです", d: "" },
+    { h: "スキルとして身につけるだけでも、ダメです", d: "" },
+    { h: "そのスキルを使う環境をつくり、実際に使うところまで考える", d: "" },
+  ], { y: 4.2, gap: 0.75, hs: 19 });
+  note(s, "だから、このあと手を動かしていただきます。");
+  s.addNotes("講義パートの最後。ワークをやる理由をここで納得してもらう。");
+}
+
+sectionSlide(7, "このあとのワークについて", "質疑応答の前に、内容だけ先にお伝えします");
 
 {
   const s = content("ワークの流れ", "個人ワーク");
   cards(s, [
-    { t: "ステップ1（10分）\n人脈マップを埋める", b: "私の26件と同じ6つの枠に、自分の名前で書き込みます。\n\nAの「過去の縁」は、全員が書けます。" },
-    { t: "ステップ2（9分）\n循環を1本描く", b: "Aから1人だけ選び、矢印を描きます。\n\n1本回れば、あとは同じことの繰り返しです。" },
-    { t: "ステップ3（5分）\n今日やる1つを決める", b: "登録先をその場で1つ申し込む。\nまたは、描いた相手にその場で連絡する。\n\n行動を完了させて帰ってください。" },
-  ], { y: 2.1, h: 3.5 });
+    { t: "ステップ1（7分）\n人脈マップを埋める", b: "私の26件と同じ6つの枠に、自分の名前で書き込みます。\n\nAの「過去の縁」は、全員が書けます。" },
+    { t: "ステップ2（8分）\n循環を1本描く", b: "Aから1人だけ選び、矢印を描きます。\n\n1本回れば、あとは同じことの繰り返しです。" },
+  ], { y: 2.1, h: 3.2 });
+  s.addText("このワークは、自分を自分でコンサルする時間です。現実を棚卸しして、方策を1本描きます。\nワークは15分、そのあと発表が30分。質疑応答の間に考えておいてください。", { x: M, y: 5.5, w: CW, h: 1.0, fontFace: F, fontSize: 17, bold: true, color: NAVY, isTextBox: true, margin: 0, lineSpacing: 26, fit: "shrink" });
 }
 
 {
-  const s = content("ステップ1：人脈マップ（10分）", "個人ワーク");
+  const s = content("ステップ1：人脈マップ（7分）", "個人ワーク");
   const items = [
     { t: "A 過去の縁", b: "前職の同僚・取引先、顧客、地元、家族、友人。思いつく限り名前で書く" },
     { t: "B 登録できる先", b: "支部のキャリアデータベース、中小機構、信用保証協会、公社、商工会議所" },
@@ -796,7 +1010,7 @@ sectionSlide(8, "個人ワーク：自分のエコシステムを設計する", 
 }
 
 {
-  const s = content("ステップ2：循環を1本描く（9分）", "個人ワーク");
+  const s = content("ステップ2：循環を1本描く（8分）", "個人ワーク");
   const box = (x, y, w, t, fill, color) => {
     s.addShape(pres.ShapeType.roundRect, { x, y, w, h: 1.0, rectRadius: 0.06, fill: { color: fill }, line: { color: fill } });
     s.addText(t, { x: x + 0.12, y, w: w - 0.24, h: 1.0, fontFace: F, fontSize: 15, bold: true, color, align: "center", valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
@@ -817,13 +1031,20 @@ sectionSlide(8, "個人ワーク：自分のエコシステムを設計する", 
   s.addNotes("scalar の例は当日、実際の関わり方に合わせて言い換えてください。");
 }
 
+statement("質疑応答", "1時間とります。何でも聞いてください。")
+  .addNotes("ここから1時間。出た質問は板書して、ワークの前に整理する。");
+
+statement("個人ワーク（15分）", "ステップ1：人脈マップ 7分　／　ステップ2：循環を1本描く 8分")
+  .addNotes("手を動かす時間。机を回って、Aが埋まらない人に声をかける。");
+
 {
-  const s = content("ステップ3：今日やる1つを決める（5分）", "個人ワーク");
-  cards(s, [
-    { t: "その場で登録する", b: "城北支部のキャリアデータベース\n中小機構／信用保証協会／公社の専門家登録\n\nスマホを出して、いま1つ申し込んでください。" },
-    { t: "その場で連絡する", b: "ステップ2で書いた相手に、いまメッセージを送ってください。\n\n「久しぶりに一度お話しできませんか」で十分です。" },
-  ], { y: 2.2, h: 3.0 });
-  note(s, "行動をひとつ完了させて帰る。それが今日の成果です。");
+  const s = content("発表（30分）", "発表");
+  rows(s, [
+    { h: "1人1分で、書いたものを発表してください", d: "数名の発表" },
+    { h: "話すのは2つだけ", d: "① 人脈マップで、いちばん意外だった相手　② 描いた循環を1本" },
+    { h: "うまく書けていなくて構いません", d: "人の発表が、自分のマップの空欄を埋めてくれます" },
+  ], { y: 2.2, gap: 1.2, hs: 19 });
+  note(s, "発表を聞くこと自体が、参加者どうしの人脈マップになります。");
 }
 
 // =========================================================
@@ -836,8 +1057,8 @@ sectionSlide(8, "個人ワーク：自分のエコシステムを設計する", 
   const items = [
     "私の26件は、全部「信用」から来ました。売り込んだ仕事はひとつもありません",
     "尖っていなくていい。尖りは結果であって、出発点ではありません",
-    "信用は材料、エコシステムが仕組みです。1本回れば、あとは繰り返しです",
-    "やらない仕事を決めて、自分が幸せになる仕事を選んでください",
+    "違いは、仕組み化できているかどうかです。販売をせずに売れる仕組みをつくってください",
+    "ファネルの出口は、入口に戻ります。1件の成果が、次の入口を大きくします",
   ];
   items.forEach((t, i) => {
     const y = 1.9 + i * 0.95;
@@ -846,6 +1067,65 @@ sectionSlide(8, "個人ワーク：自分のエコシステムを設計する", 
     s.addText(t, { x: M + 0.8, y: y - 0.05, w: CW - 0.9, h: 0.6, fontFace: F, fontSize: 18, color: WHITE, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
   });
   s.addText("私が3年前にこの席で聞きたかったことを、今日は全部お話ししました。\n数字も名前も出しました。次は、皆さんの番です。", { x: M, y: 5.9, w: CW, h: 1.0, fontFace: F, fontSize: 19, bold: true, color: ICE, isTextBox: true, margin: 0, lineSpacing: 30, fit: "shrink" });
+}
+
+// =========================================================
+// ワークシート（白紙・記入用）
+// =========================================================
+const LINE = "C9CEDD";
+
+function sheetHeader(s, title, sub) {
+  s.addText(title, { x: M, y: 0.45, w: CW - 3.6, h: 0.6, fontFace: F, fontSize: 26, bold: true, color: NAVY, isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText(sub, { x: M, y: 1.05, w: CW - 3.6, h: 0.35, fontFace: F, fontSize: 13, color: GRAY, isTextBox: true, margin: 0, fit: "shrink" });
+  s.addText("お名前", { x: W - M - 3.4, y: 0.55, w: 0.8, h: 0.4, fontFace: F, fontSize: 12, color: GRAY, valign: "middle", isTextBox: true, margin: 0 });
+  s.addShape(pres.ShapeType.roundRect, { x: W - M - 2.6, y: 0.5, w: 2.6, h: 0.5, rectRadius: 0.05, fill: { color: WHITE }, line: { color: LINE, width: 1 } });
+}
+
+{
+  const s = pres.addSlide();
+  s.background = { color: WHITE };
+  sheetHeader(s, "ワークシート①　人脈マップ", "思いつく限り、名前で書いてください。うまく書けなくて構いません。（7分）");
+  const items = [
+    { t: "A　過去の縁", h: "前職の同僚・取引先、顧客、地元、家族、友人" },
+    { t: "B　登録できる先", h: "支部のキャリアデータベース、中小機構、信用保証協会、公社、商工会議所" },
+    { t: "C　お誘いをくれそうな人", h: "支部の先輩、同期、研究会" },
+    { t: "D　紹介を生みそうな人", h: "Aのうち、人を紹介してくれそうな人に◎" },
+    { t: "E　逆営業できる相手", h: "いま自分に営業してきている人（保険・不動産・システムなど）" },
+    { t: "F　個人的な縁", h: "趣味、子どもの縁、地域" },
+  ];
+  const cw2 = (CW - 0.4) / 3;
+  const ch = 2.4;
+  items.forEach((it, i) => {
+    const col = i % 3;
+    const row = i < 3 ? 0 : 1;
+    const x = M + (cw2 + 0.2) * col;
+    const y = 1.6 + row * (ch + 0.25);
+    s.addShape(pres.ShapeType.roundRect, { x: x, y: y, w: cw2, h: ch, rectRadius: 0.06, fill: { color: WHITE }, line: { color: LINE, width: 1 } });
+    s.addShape(pres.ShapeType.rect, { x: x, y: y, w: cw2, h: 0.42, fill: { color: SOFT }, line: { color: SOFT } });
+    s.addText(it.t, { x: x + 0.15, y: y, w: cw2 - 0.3, h: 0.42, fontFace: F, fontSize: 14, bold: true, color: NAVY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+    s.addText(it.h, { x: x + 0.15, y: y + 0.46, w: cw2 - 0.3, h: 0.45, fontFace: F, fontSize: 10, color: GRAY, isTextBox: true, margin: 0, lineSpacing: 14, fit: "shrink" });
+  });
+  s.addText("城北プロコン塾　新人プロコン顧客開拓へのアドバイス", { x: M, y: 6.9, w: CW, h: 0.35, fontFace: F, fontSize: 10, color: GRAY, isTextBox: true, margin: 0 });
+}
+
+{
+  const s = pres.addSlide();
+  s.background = { color: WHITE };
+  sheetHeader(s, "ワークシート②　循環を1本描く", "Aから1人だけ選んで、矢印をたどりながら書いてください。（8分）");
+  const labels = ["① 誰から", "② どんな仕事", "③ 期待以上に何をするか", "④ 誰に紹介してもらえそうか"];
+  const bw = 2.85, gp = 0.28;
+  labels.forEach((t, i) => {
+    const x = M + (bw + gp) * i;
+    s.addShape(pres.ShapeType.roundRect, { x: x, y: 1.65, w: bw, h: 2.5, rectRadius: 0.06, fill: { color: WHITE }, line: { color: LINE, width: 1 } });
+    s.addShape(pres.ShapeType.rect, { x: x, y: 1.65, w: bw, h: 0.45, fill: { color: SOFT }, line: { color: SOFT } });
+    s.addText(t, { x: x + 0.12, y: 1.65, w: bw - 0.24, h: 0.45, fontFace: F, fontSize: 13, bold: true, color: NAVY, valign: "middle", isTextBox: true, margin: 0, fit: "shrink" });
+    if (i < 3) s.addShape(pres.ShapeType.rightArrow, { x: x + bw + 0.02, y: 2.75, w: 0.24, h: 0.22, fill: { color: GOLD }, line: { color: GOLD } });
+  });
+  s.addText("⑤ 紹介してくれた人に、どう結果を返しますか", { x: M, y: 4.4, w: CW, h: 0.35, fontFace: F, fontSize: 14, bold: true, color: NAVY, isTextBox: true, margin: 0 });
+  s.addShape(pres.ShapeType.roundRect, { x: M, y: 4.8, w: CW, h: 0.9, rectRadius: 0.06, fill: { color: WHITE }, line: { color: LINE, width: 1 } });
+  s.addText("⑥ この循環を回すために、3か月以内にやること", { x: M, y: 5.85, w: CW, h: 0.35, fontFace: F, fontSize: 14, bold: true, color: NAVY, isTextBox: true, margin: 0 });
+  s.addShape(pres.ShapeType.roundRect, { x: M, y: 6.25, w: CW, h: 0.55, rectRadius: 0.06, fill: { color: WHITE }, line: { color: LINE, width: 1 } });
+  s.addText("城北プロコン塾　新人プロコン顧客開拓へのアドバイス", { x: M, y: 6.9, w: CW, h: 0.35, fontFace: F, fontSize: 10, color: GRAY, isTextBox: true, margin: 0 });
 }
 
 const out = process.argv[2] || "lecture-johoku-procon.pptx";
